@@ -58,9 +58,9 @@ permalink: /calculators/pricing/
 </div>
 
 <script type="module">
-  import { CostBuilder } from '/assets/js/costBuilder.js';
-  import { PricingEngine } from '/assets/js/pricingEngine.js';
-  import { formatCurrency, formatPercent } from '/assets/js/ui.js';
+  import { CostBuilder } from '{{ '/assets/js/costBuilder.js' | url }}';
+  import { PricingEngine } from '{{ '/assets/js/pricingEngine.js' | url }}';
+  import { formatCurrency, formatPercent } from '{{ '/assets/js/ui.js' | url }}';
 
   document.getElementById('pricing-form').addEventListener('submit', function(e) {
     e.preventDefault();

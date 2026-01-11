@@ -90,9 +90,9 @@ permalink: /calculators/markup-margin/
 </div>
 
 <script type="module">
-  import { CostBuilder } from '/assets/js/costBuilder.js';
-  import { MarginCalculator } from '/assets/js/margin.js';
-  import { formatCurrency, formatPercent } from '/assets/js/ui.js';
+  import { CostBuilder } from '{{ '/assets/js/costBuilder.js' | url }}';
+  import { MarginCalculator } from '{{ '/assets/js/margin.js' | url }}';
+  import { formatCurrency, formatPercent } from '{{ '/assets/js/ui.js' | url }}';
 
   document.getElementById('margin-form').addEventListener('submit', function(e) {
     e.preventDefault();

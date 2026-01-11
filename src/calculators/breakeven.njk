@@ -57,9 +57,9 @@ permalink: /calculators/breakeven/
 </div>
 
 <script type="module">
-  import { CostBuilder } from '/assets/js/costBuilder.js';
-  import { BreakevenCalculator } from '/assets/js/breakeven.js';
-  import { formatCurrency } from '/assets/js/ui.js';
+  import { CostBuilder } from '{{ '/assets/js/costBuilder.js' | url }}';
+  import { BreakevenCalculator } from '{{ '/assets/js/breakeven.js' | url }}';
+  import { formatCurrency } from '{{ '/assets/js/ui.js' | url }}';
 
   document.getElementById('breakeven-form').addEventListener('submit', function(e) {
     e.preventDefault();
