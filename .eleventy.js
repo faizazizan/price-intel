@@ -4,6 +4,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/assets/css");
   
   return {
+    pathPrefix: "/price-intel/",
     dir: {
       input: "src",
       output: "_site",

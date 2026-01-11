@@ -2,18 +2,18 @@
   <div class="container mx-auto px-4 max-w-7xl">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
-      <a href="/" class="flex items-center space-x-2">
+      <a href="{{ '/' | url }}" class="flex items-center space-x-2">
         <span class="text-2xl">💰</span>
         <span class="text-xl font-bold text-gradient">PriceIntel</span>
       </a>
       
       <!-- Desktop Navigation -->
       <div class="hidden md:flex space-x-6">
-        <a href="/" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Home</a>
-        <a href="/calculators/ecommerce/" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">E-commerce</a>
-        <a href="/calculators/pricing/" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Pricing</a>
-        <a href="/calculators/breakeven/" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Breakeven</a>
-        <a href="/calculators/markup-margin/" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Margin</a>
+        <a href="{{ '/' | url }}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Home</a>
+        <a href="{{ '/calculators/ecommerce/' | url }}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">E-commerce</a>
+        <a href="{{ '/calculators/pricing/' | url }}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Pricing</a>
+        <a href="{{ '/calculators/breakeven/' | url }}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Breakeven</a>
+        <a href="{{ '/calculators/markup-margin/' | url }}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors">Margin</a>
       </div>
       
       <!-- Mobile Menu Button -->
@@ -26,11 +26,11 @@
     
     <!-- Mobile Navigation -->
     <div id="mobile-menu" class="hidden md:hidden pb-4">
-      <a href="/" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Home</a>
-      <a href="/calculators/ecommerce/" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">E-commerce</a>
-      <a href="/calculators/pricing/" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Pricing</a>
-      <a href="/calculators/breakeven/" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Breakeven</a>
-      <a href="/calculators/markup-margin/" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Margin</a>
+      <a href="{{ '/' | url }}" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Home</a>
+      <a href="{{ '/calculators/ecommerce/' | url }}" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">E-commerce</a>
+      <a href="{{ '/calculators/pricing/' | url }}" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Pricing</a>
+      <a href="{{ '/calculators/breakeven/' | url }}" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Breakeven</a>
+      <a href="{{ '/calculators/markup-margin/' | url }}" class="block py-2 text-gray-600 hover:text-primary-600 font-medium">Margin</a>
     </div>
   </div>
 </nav>
