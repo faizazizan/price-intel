@@ -1,0 +1,281 @@
+---
+layout: layout.njk
+title: E-commerce Calculator
+description: Unified cost builder for ecommerce - Calculate true costs, margins, and profitability for Shopee, Lazada, and TikTok Shop
+permalink: /calculators/ecommerce/
+---
+
+<div class="mb-8">
+  <h1 class="text-4xl font-bold text-gray-900 mb-4">E-commerce Calculator</h1>
+  <p class="text-lg text-gray-600">
+    Calculate your true costs, optimal pricing, and profitability for platforms like Shopee, Lazada, and TikTok Shop.
+  </p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <!-- Input Form -->
+  <div>
+    <div class="card sticky top-8">
+      <h2 class="text-2xl font-bold mb-6">Input Your Costs</h2>
+      
+      <form id="ecommerce-form" class="space-y-5">
+        <!-- Product Cost -->
+        <div class="input-group">
+          <label for="productCost">Product Cost (RM) *</label>
+          <input type="number" id="productCost" name="productCost" step="0.01" min="0" required>
+          <p class="help-text">Cost to produce or purchase the product</p>
+          <p id="productCost-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Selling Price -->
+        <div class="input-group">
+          <label for="sellingPrice">Selling Price (RM) *</label>
+          <input type="number" id="sellingPrice" name="sellingPrice" step="0.01" min="0" required>
+          <p class="help-text">Price you plan to sell at</p>
+          <p id="sellingPrice-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Platform Fee -->
+        <div class="input-group">
+          <label for="platformFeePercent">Platform Fee (%)</label>
+          <input type="number" id="platformFeePercent" name="platformFeePercent" step="0.1" min="0" max="100" value="0">
+          <p class="help-text">Shopee: 3-5%, Lazada: 2-4%, TikTok: 2-6%</p>
+          <p id="platformFeePercent-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Logistics -->
+        <div class="input-group">
+          <label for="logistics">Logistics Cost (RM)</label>
+          <input type="number" id="logistics" name="logistics" step="0.01" min="0" value="0">
+          <p class="help-text">Shipping and delivery cost per unit</p>
+          <p id="logistics-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Ads Cost -->
+        <div class="input-group">
+          <label for="adsCostPerUnit">Ads Cost Per Unit (RM)</label>
+          <input type="number" id="adsCostPerUnit" name="adsCostPerUnit" step="0.01" min="0" value="0">
+          <p class="help-text">Marketing cost allocated per sale</p>
+          <p id="adsCostPerUnit-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Payment Gateway -->
+        <div class="input-group">
+          <label for="paymentGatewayPercent">Payment Gateway Fee (%)</label>
+          <input type="number" id="paymentGatewayPercent" name="paymentGatewayPercent" step="0.1" min="0" max="100" value="0">
+          <p class="help-text">Usually 1.5-3%</p>
+          <p id="paymentGatewayPercent-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Monthly Fixed Cost -->
+        <div class="input-group">
+          <label for="monthlyFixedCost">Monthly Fixed Cost (RM)</label>
+          <input type="number" id="monthlyFixedCost" name="monthlyFixedCost" step="0.01" min="0" value="0">
+          <p class="help-text">Rent, salaries, utilities, subscriptions</p>
+          <p id="monthlyFixedCost-error" class="error-text hidden"></p>
+        </div>
+        
+        <!-- Wastage -->
+        <div class="input-group">
+          <label for="wastagePercent">Wastage (%)</label>
+          <input type="number" id="wastagePercent" name="wastagePercent" step="0.1" min="0" max="100" value="0">
+          <p class="help-text">Damaged, returned, or unsold inventory %</p>
+          <p id="wastagePercent-error" class="error-text hidden"></p>
+        </div>
+        
+        <div class="flex gap-4">
+          <button type="submit" class="btn-primary flex-1">Calculate</button>
+          <button type="button" id="clear-btn" class="btn-secondary">Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Results -->
+  <div>
+    <div id="results" class="space-y-6">
+      <div class="card bg-gray-50 border-dashed border-2 border-gray-300 text-center py-12">
+        <p class="text-gray-500">Enter your costs and click Calculate to see results</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- What This Means Section -->
+<div class="mt-12 card bg-blue-50 border-blue-200">
+  <h2 class="text-2xl font-bold mb-4">📚 What This Means</h2>
+  <div class="space-y-4 text-gray-700">
+    <div>
+      <strong>True Cost:</strong> The total amount it costs you to sell one unit, including all fees and expenses.
+    </div>
+    <div>
+      <strong>Contribution:</strong> How much each sale contributes to covering fixed costs and generating profit.
+    </div>
+    <div>
+      <strong>Contribution Margin %:</strong> The percentage of each sale that goes toward profit after variable costs.
+    </div>
+    <div>
+      <strong>Breakeven Units:</strong> The number of units you must sell to cover all your monthly fixed costs.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { CostBuilder } from '/assets/js/costBuilder.js';
+  import { PricingEngine } from '/assets/js/pricingEngine.js';
+  import { MarginCalculator } from '/assets/js/margin.js';
+  import { BreakevenCalculator } from '/assets/js/breakeven.js';
+  import { formatCurrency, formatPercent, getFormValues } from '/assets/js/ui.js';
+
+  const form = document.getElementById('ecommerce-form');
+  const resultsDiv = document.getElementById('results');
+  const clearBtn = document.getElementById('clear-btn');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    calculateResults();
+  });
+
+  clearBtn.addEventListener('click', function() {
+    form.reset();
+    resultsDiv.innerHTML = `
+      <div class="card bg-gray-50 border-dashed border-2 border-gray-300 text-center py-12">
+        <p class="text-gray-500">Enter your costs and click Calculate to see results</p>
+      </div>
+    `;
+  });
+
+  function calculateResults() {
+    const values = getFormValues('ecommerce-form');
+    
+    // Create cost builder
+    const costBuilder = new CostBuilder(values);
+    
+    // Validate
+    const validation = costBuilder.validate();
+    if (!validation.isValid) {
+      alert('Validation errors:\n' + validation.errors.join('\n'));
+      return;
+    }
+    
+    // Get all calculators
+    const pricingEngine = new PricingEngine(costBuilder);
+    const marginCalc = new MarginCalculator(costBuilder);
+    const breakevenCalc = new BreakevenCalculator(costBuilder);
+    
+    // Get data
+    const breakdown = costBuilder.getCostBreakdown();
+    const marginAnalysis = marginCalc.getAnalysis();
+    const breakevenAnalysis = breakevenCalc.getAnalysis();
+    const pricingSuggestions = pricingEngine.generateSuggestions();
+    
+    // Display results
+    displayResults(breakdown, marginAnalysis, breakevenAnalysis, pricingSuggestions);
+  }
+
+  function displayResults(breakdown, marginAnalysis, breakevenAnalysis, pricingSuggestions) {
+    const isProfitable = breakdown.contribution > 0;
+    const profitabilityBadge = isProfitable ? 'badge-success' : 'badge-danger';
+    
+    let html = `
+      <!-- Cost Breakdown -->
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-4">💰 Cost Breakdown</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>Product Cost:</span><span class="font-semibold">${formatCurrency(breakdown.productCost)}</span></div>
+          <div class="flex justify-between"><span>Logistics:</span><span class="font-semibold">${formatCurrency(breakdown.logistics)}</span></div>
+          <div class="flex justify-between"><span>Ads Cost:</span><span class="font-semibold">${formatCurrency(breakdown.adsCostPerUnit)}</span></div>
+          <div class="flex justify-between"><span>Platform Fee:</span><span class="font-semibold">${formatCurrency(breakdown.platformFee)}</span></div>
+          <div class="flex justify-between"><span>Payment Fee:</span><span class="font-semibold">${formatCurrency(breakdown.paymentFee)}</span></div>
+          <div class="flex justify-between"><span>Wastage:</span><span class="font-semibold">${formatCurrency(breakdown.wastageCost)}</span></div>
+          <div class="border-t border-gray-300 my-2"></div>
+          <div class="flex justify-between text-lg"><span class="font-bold">True Cost:</span><span class="font-bold text-primary-600">${formatCurrency(breakdown.trueCost)}</span></div>
+        </div>
+      </div>
+      
+      <!-- Profitability -->
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-4">📊 Profitability</h3>
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm text-gray-600">Contribution per Unit</p>
+            <p class="text-3xl font-bold ${isProfitable ? 'text-green-600' : 'text-red-600'}">${formatCurrency(breakdown.contribution)}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Contribution Margin</p>
+            <p class="text-2xl font-bold">${formatPercent(breakdown.contributionPercent)}</p>
+          </div>
+          <span class="badge ${profitabilityBadge}">${isProfitable ? 'Profitable' : 'Losing Money'}</span>
+        </div>
+      </div>
+      
+      <!-- Markup & Margin -->
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-4">📈 Markup & Margin</h3>
+        <div class="space-y-3">
+          <div>
+            <p class="text-sm text-gray-600">Markup %</p>
+            <p class="text-2xl font-bold">${formatPercent(marginAnalysis.markup)}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Gross Margin %</p>
+            <p class="text-2xl font-bold">${formatPercent(marginAnalysis.margin)}</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Breakeven -->
+      ${breakdown.monthlyFixedCost > 0 ? `
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-4">🎯 Breakeven Analysis</h3>
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm text-gray-600">Units to Breakeven</p>
+            <p class="text-3xl font-bold text-primary-600">${breakevenAnalysis.isAchievable ? breakevenAnalysis.breakevenUnits : '∞'}</p>
+          </div>
+          ${breakevenAnalysis.isAchievable ? `
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-gray-600">Per Day</p>
+              <p class="font-bold">${breakevenAnalysis.dailyUnitsNeeded} units</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Per Week</p>
+              <p class="font-bold">${breakevenAnalysis.weeklyUnitsNeeded} units</p>
+            </div>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Breakeven Revenue</p>
+            <p class="text-xl font-bold">${formatCurrency(breakevenAnalysis.breakevenRevenue)}</p>
+          </div>
+          ` : `<p class="text-red-600 text-sm">Cannot breakeven with current pricing</p>`}
+        </div>
+      </div>
+      ` : ''}
+      
+      <!-- Pricing Suggestions -->
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-4">💡 Smart Pricing Suggestions</h3>
+        <div class="space-y-3">
+          ${pricingSuggestions.map(s => `
+            <div class="p-4 rounded-lg ${s.risk === 'Low' ? 'bg-green-50 border border-green-200' : s.risk === 'Medium' ? 'bg-blue-50 border border-blue-200' : 'bg-orange-50 border border-orange-200'}">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <p class="font-bold text-gray-900">${s.label}</p>
+                  <p class="text-sm text-gray-600">${s.description}</p>
+                </div>
+                <span class="badge ${s.risk === 'Low' ? 'badge-success' : s.risk === 'Medium' ? 'bg-blue-100 text-blue-800' : 'badge-warning'}">${s.risk} Risk</span>
+              </div>
+              <div class="mt-2">
+                <p class="text-2xl font-bold text-gray-900">${formatCurrency(s.price)}</p>
+                <p class="text-sm text-gray-600">Margin: ${formatPercent(s.actualMargin)} • Contribution: ${formatCurrency(s.contribution)}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    
+    resultsDiv.innerHTML = html;
+  }
+</script>

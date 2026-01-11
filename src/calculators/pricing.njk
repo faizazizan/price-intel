@@ -1,0 +1,147 @@
+---
+layout: layout.njk
+title: Smart Pricing Calculator
+description: Get Conservative, Balanced, and Aggressive pricing recommendations with risk indicators
+permalink: /calculators/pricing/
+---
+
+<div class="mb-8">
+  <h1 class="text-4xl font-bold text-gray-900 mb-4">Smart Pricing Calculator</h1>
+  <p class="text-lg text-gray-600">
+    Get 3 data-driven pricing recommendations based on your costs and target margins.
+  </p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <!-- Input Form -->
+  <div>
+    <div class="card sticky top-8">
+      <h2 class="text-2xl font-bold mb-6">Input Your Data</h2>
+      
+      <form id="pricing-form" class="space-y-5">
+        <div class="input-group">
+          <label for="productCost">Product Cost (RM) *</label>
+          <input type="number" id="productCost" name="productCost" step="0.01" min="0" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="logistics">Logistics Cost (RM)</label>
+          <input type="number" id="logistics" name="logistics" step="0.01" min="0" value="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="platformFeePercent">Platform Fee (%)</label>
+          <input type="number" id="platformFeePercent" name="platformFeePercent" step="0.1" min="0" max="100" value="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="paymentGatewayPercent">Payment Gateway Fee (%)</label>
+          <input type="number" id="paymentGatewayPercent" name="paymentGatewayPercent" step="0.1" min="0" max="100" value="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="adsCostPerUnit">Ads Cost Per Unit (RM)</label>
+          <input type="number" id="adsCostPerUnit" name="adsCostPerUnit" step="0.01" min="0" value="0">
+        </div>
+        
+        <button type="submit" class="btn-primary w-full">Generate Pricing Options</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Results -->
+  <div id="results" class="space-y-6">
+    <div class="card bg-gray-50 border-dashed border-2 border-gray-300 text-center py-12">
+      <p class="text-gray-500">Enter your costs to see pricing recommendations</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { CostBuilder } from '/assets/js/costBuilder.js';
+  import { PricingEngine } from '/assets/js/pricingEngine.js';
+  import { formatCurrency, formatPercent } from '/assets/js/ui.js';
+
+  document.getElementById('pricing-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const values = Object.fromEntries(formData);
+    
+    // Need to set a temporary selling price to calculate fees
+    // We'll use average of suggested prices
+    values.sellingPrice = 100;
+    
+    const costBuilder = new CostBuilder(values);
+    const trueCost = costBuilder.getTrueCost();
+    
+    // Now create pricing engine with actual cost
+    values.sellingPrice = trueCost * 1.5; // temp value
+    const finalCostBuilder = new CostBuilder(values);
+    const pricingEngine = new PricingEngine(finalCostBuilder);
+    const suggestions = pricingEngine.generateSuggestions();
+    
+    displayResults(trueCost, suggestions);
+  });
+
+  function displayResults(trueCost, suggestions) {
+    const html = `
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-2">Your True Cost</h3>
+        <p class="text-4xl font-bold text-primary-600">${formatCurrency(trueCost)}</p>
+        <p class="text-sm text-gray-600 mt-2">This is your baseline. All prices below must be higher than this.</p>
+      </div>
+      
+      ${suggestions.map((s, i) => `
+        <div class="card-result ${i === 1 ? 'ring-2 ring-primary-500' : ''}">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h3 class="text-2xl font-bold">${s.label}</h3>
+              <p class="text-sm text-gray-600 mt-1">${s.description}</p>
+            </div>
+            <span class="badge ${s.risk === 'Low' ? 'badge-success' : s.risk === 'Medium' ? 'bg-blue-100 text-blue-800' : 'badge-warning'}">
+              ${s.risk} Risk
+            </span>
+          </div>
+          
+          <div class="bg-white rounded-lg p-4 mb-4">
+            <p class="text-sm text-gray-600 mb-1">Recommended Price</p>
+            <p class="text-4xl font-bold text-gray-900">${formatCurrency(s.price)}</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-gray-600">Target Margin</p>
+              <p class="font-bold">${formatPercent(s.targetMargin)}</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Actual Margin</p>
+              <p class="font-bold">${formatPercent(s.actualMargin)}</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Contribution</p>
+              <p class="font-bold">${formatCurrency(s.contribution)}</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Markup</p>
+              <p class="font-bold">${formatPercent((s.price - trueCost) / trueCost * 100)}</p>
+            </div>
+          </div>
+          
+          ${i === 1 ? '<p class="mt-4 text-sm font-semibold text-primary-600">⭐ Recommended for most scenarios</p>' : ''}
+        </div>
+      `).join('')}
+      
+      <div class="card bg-blue-50 border-blue-200">
+        <h3 class="font-bold mb-2">💡 How to Choose</h3>
+        <ul class="text-sm space-y-2 text-gray-700">
+          <li><strong>Conservative:</strong> Use in highly competitive markets or when testing demand</li>
+          <li><strong>Balanced:</strong> Best for most products with moderate competition</li>
+          <li><strong>Aggressive:</strong> For unique products, premium brands, or low competition</li>
+        </ul>
+      </div>
+    `;
+    
+    document.getElementById('results').innerHTML = html;
+  }
+</script>

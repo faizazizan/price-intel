@@ -1,0 +1,26 @@
+{
+  "name": "price-intel",
+  "version": "1.0.0",
+  "description": "Unified Pricing & Profit Intelligence Web App",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:eleventy": "eleventy --serve",
+    "dev:tailwind": "tailwindcss -i ./src/assets/css/tailwind.css -o ./_site/assets/css/styles.css --watch",
+    "build": "npm run build:tailwind && npm run build:eleventy",
+    "build:tailwind": "tailwindcss -i ./src/assets/css/tailwind.css -o ./_site/assets/css/styles.css --minify",
+    "build:eleventy": "eleventy"
+  },
+  "keywords": [
+    "pricing",
+    "profit",
+    "calculator",
+    "ecommerce"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "concurrently": "^8.2.2",
+    "tailwindcss": "^3.4.1"
+  }
+}

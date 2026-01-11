@@ -1,0 +1,155 @@
+---
+layout: layout.njk
+title: Breakeven Calculator
+description: Calculate how many units you need to sell to cover costs and start making profit
+permalink: /calculators/breakeven/
+---
+
+<div class="mb-8">
+  <h1 class="text-4xl font-bold text-gray-900 mb-4">Breakeven Calculator</h1>
+  <p class="text-lg text-gray-600">
+    Calculate exactly how many units you need to sell to cover all your costs and start making profit.
+  </p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <div>
+    <div class="card sticky top-8">
+      <h2 class="text-2xl font-bold mb-6">Input Your Data</h2>
+      
+      <form id="breakeven-form" class="space-y-5">
+        <div class="input-group">
+          <label for="sellingPrice">Selling Price (RM) *</label>
+          <input type="number" id="sellingPrice" name="sellingPrice" step="0.01" min="0" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="productCost">Product Cost (RM) *</label>
+          <input type="number" id="productCost" name="productCost" step="0.01" min="0" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="logistics">Logistics Cost (RM)</label>
+          <input type="number" id="logistics" name="logistics" step="0.01" min="0" value="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="platformFeePercent">Platform Fee (%)</label>
+          <input type="number" id="platformFeePercent" name="platformFeePercent" step="0.1" min="0" max="100" value="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="monthlyFixedCost">Monthly Fixed Cost (RM) *</label>
+          <input type="number" id="monthlyFixedCost" name="monthlyFixedCost" step="0.01" min="0" required>
+          <p class="help-text">Rent, salaries, utilities, subscriptions</p>
+        </div>
+        
+        <button type="submit" class="btn-primary w-full">Calculate Breakeven</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="results" class="space-y-6">
+    <div class="card bg-gray-50 border-dashed border-2 border-gray-300 text-center py-12">
+      <p class="text-gray-500">Enter your data to calculate breakeven point</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { CostBuilder } from '/assets/js/costBuilder.js';
+  import { BreakevenCalculator } from '/assets/js/breakeven.js';
+  import { formatCurrency } from '/assets/js/ui.js';
+
+  document.getElementById('breakeven-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const values = Object.fromEntries(formData);
+    
+    const costBuilder = new CostBuilder(values);
+    const breakevenCalc = new BreakevenCalculator(costBuilder);
+    const analysis = breakevenCalc.getAnalysis();
+    const contribution = costBuilder.getContribution();
+    
+    displayResults(analysis, contribution, values);
+  });
+
+  function displayResults(analysis, contribution, values) {
+    const isAchievable = analysis.isAchievable;
+    
+    const html = `
+      <div class="card-result">
+        <h3 class="text-lg font-bold mb-4">📊 Your Numbers</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span>Selling Price:</span>
+            <span class="font-semibold">${formatCurrency(values.sellingPrice)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Variable Cost:</span>
+            <span class="font-semibold">${formatCurrency(values.sellingPrice - contribution)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Contribution per Unit:</span>
+            <span class="font-bold text-primary-600">${formatCurrency(contribution)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Fixed Cost (Monthly):</span>
+            <span class="font-semibold">${formatCurrency(analysis.fixedCost)}</span>
+          </div>
+        </div>
+      </div>
+      
+      ${isAchievable ? `
+        <div class="card-result bg-gradient-to-br from-primary-50 to-blue-50">
+          <h3 class="text-lg font-bold mb-2">🎯 Breakeven Point</h3>
+          <p class="text-5xl font-bold text-primary-600 my-4">${analysis.breakevenUnits}</p>
+          <p class="text-lg font-semibold text-gray-700">units per month</p>
+        </div>
+        
+        <div class="card-result">
+          <h3 class="text-lg font-bold mb-4">📅 What This Means</h3>
+          <div class="space-y-4">
+            <div class="p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm text-gray-600">Daily Target</p>
+              <p class="text-2xl font-bold">${analysis.dailyUnitsNeeded} units/day</p>
+            </div>
+            <div class="p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm text-gray-600">Weekly Target</p>
+              <p class="text-2xl font-bold">${analysis.weeklyUnitsNeeded} units/week</p>
+            </div>
+            <div class="p-4 bg-green-50 rounded-lg">
+              <p class="text-sm text-gray-600">Breakeven Revenue</p>
+              <p class="text-2xl font-bold text-green-700">${formatCurrency(analysis.breakevenRevenue)}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card bg-green-50 border-green-200">
+          <h3 class="font-bold mb-2">✅ Action Items</h3>
+          <ul class="text-sm space-y-1 text-gray-700">
+            <li>• Sell ${analysis.breakevenUnits} units to cover all costs</li>
+            <li>• Every unit beyond ${analysis.breakevenUnits} contributes ${formatCurrency(contribution)} to profit</li>
+            <li>• Focus on reaching ${analysis.dailyUnitsNeeded} sales per day</li>
+          </ul>
+        </div>
+      ` : `
+        <div class="card-result bg-red-50 border-red-200">
+          <h3 class="text-lg font-bold text-red-700 mb-2">⚠️ Cannot Breakeven</h3>
+          <p class="text-gray-700">Your contribution per unit is zero or negative. You cannot cover fixed costs with this pricing.</p>
+          <div class="mt-4 p-4 bg-white rounded-lg">
+            <p class="text-sm font-semibold mb-2">Recommendations:</p>
+            <ul class="text-sm space-y-1">
+              <li>• Increase your selling price</li>
+              <li>• Reduce variable costs (product, logistics, fees)</li>
+              <li>• Reduce fixed costs</li>
+            </ul>
+          </div>
+        </div>
+      `}
+    `;
+    
+    document.getElementById('results').innerHTML = html;
+  }
+</script>
