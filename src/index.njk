@@ -5,20 +5,36 @@ description: Unified Pricing & Profit Intelligence - Calculate true costs, optim
 ---
 
 <!-- Hero Section -->
-<section class="text-center py-12 mb-12">
-  <h1 class="text-5xl md:text-6xl font-extrabold text-gradient mb-6">
-    Unified Pricing & Profit Intelligence
+<section class="text-center py-20 relative overflow-hidden">
+  <!-- Decorative background element -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-200 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-[10%] right-[-10%] w-[30%] h-[30%] bg-blue-200 rounded-full blur-[100px]"></div>
+  </div>
+
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold mb-8">
+    <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
+    </span>
+    100% PRIVATE & CLIENT-SIDE
+  </div>
+
+  <h1 class="text-5xl md:text-7xl font-extrabold font-display leading-[1.1] tracking-tight text-gray-900 mb-8 max-w-4xl mx-auto">
+    Unified Pricing & <br class="hidden md:block"/>
+    <span class="text-gradient">Profit Intelligence</span>
   </h1>
-  <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-    Make confident pricing decisions in under 3 minutes. 
-    Built for ecommerce founders and SME owners.
+  
+  <p class="text-xl md:text-2xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+    Make confident pricing decisions in <span class="text-gray-900 font-semibold underline decoration-primary-400 decoration-2 underline-offset-4">under 3 minutes</span>. Built for modern ecommerce founders.
   </p>
-  <div class="flex flex-col sm:flex-row gap-4 justify-center">
-    <a href="{{ '/calculators/ecommerce/' | url }}" class="btn-primary inline-block">
+
+  <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+    <a href="{{ '/calculators/ecommerce/' | url }}" class="px-8 py-4 text-lg rounded-xl font-bold transition-all duration-200 bg-primary-600 text-white hover:bg-primary-700 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
       Start Calculating →
     </a>
-    <a href="#features" class="btn-secondary inline-block">
-      Learn More
+    <a href="#features" class="px-8 py-4 text-lg rounded-xl font-bold transition-all duration-200 bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm hover:shadow-md">
+      See How It Works
     </a>
   </div>
 </section>
